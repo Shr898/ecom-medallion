@@ -3,6 +3,12 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# ignore olist dataset
+medallion-layers-spark-jobs/bronze/archive/
+
+# ignore README.md
+README.md
+
 # C extensions
 *.so
 
