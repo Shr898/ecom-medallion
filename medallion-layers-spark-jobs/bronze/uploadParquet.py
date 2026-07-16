@@ -16,16 +16,28 @@ def upload_to_s3(df , s3_key):
 
 
 def ingest_partitioned(filepath , s3_folder , timestamp_col):
+
     df = pd.read_csv(filepath)
-    df["year"]
-    df["month"]
+    df[timestamp_col] = pd.to_datetime(df[timestamp_col])
+    df["year"] = df[timestamp_col].dt.year
+    df["month"] = df[timestamp_col].dt.month
+    df["ingestion_timestamp"] = pd.Timestamp.now()
+    df["source_file_name"] = filepath.split("/")[-1]
     
-    pass
+    for (year , month), partition_df in df.groupby(["year" , "month"]):
+        s3_key = f"bronze/{s3_folder}/year={year}/month={month:02d}/data.parquet"
+        upload_to_s3(partition_df , s3_key)
 
 
 
 def ingest_flat(filepath , s3_folder):
-    pass
+    
+    df = pd.read_csv(filepath , s3_folder)
+    df["ingestion_timestamp"] = pd.Timestamp.now()
+    df["source_file_name"] = filepath.split("/")[-1]
+
+    s3_key = f"bronze/{s3_folder}/data.parquet"
+    upload_to_s3(df, s3_key)
 
 
 
